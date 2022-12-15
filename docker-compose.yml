@@ -3,6 +3,13 @@ version: '3'
 services:
   redis:
     image: redis:latest
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "4000:80"
   postgre:
     image: postgres:latest
   worker:
@@ -12,7 +19,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-  server:
+  api:
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -26,9 +33,15 @@ services:
      - REDIS_PORT=6379
     ports:
       - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules

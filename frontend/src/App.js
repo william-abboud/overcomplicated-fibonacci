@@ -4,13 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 const calculateFibonacci = async (index) => {
-  const { data } = await axios.post(`http://server:5000/calculate-fibonacci`, { index });
+  const { data } = await axios.post(`http://server:5000/api/calculate-fibonacci`, { index });
 
   return data;
 };
 
 const fetchIndexes = async () => {
-  const { data } = await axios.get(`http://server:5000/values`);
+  const { data } = await axios.get(`http://server:5000/api/values`);
 
   return data;
 };

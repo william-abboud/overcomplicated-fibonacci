@@ -4,13 +4,19 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 const calculateFibonacci = async (index) => {
-  const { data } = await axios.post(`http://server:5000/api/calculate-fibonacci`, { index });
+  const { data } = await axios.post(`/api/calculate-fibonacci`, { num: index });
 
   return data;
 };
 
 const fetchIndexes = async () => {
-  const { data } = await axios.get(`http://server:5000/api/values`);
+  const { data } = await axios.get(`/api/values`);
+
+  return data;
+};
+
+const fetchResults = async () => {
+  const { data } = await axios.get(`/api/values/current`);
 
   return data;
 };
@@ -18,12 +24,15 @@ const fetchIndexes = async () => {
 function App() {
   const [index, setIndex] = useState(0);
   const [indexes, setIndexes] = useState([]);
+  const [results, setResults] = useState({});
 
   const handleSubmission = useCallback(async (event) => {
     event.preventDefault();
 
     try {
       await calculateFibonacci(index);
+      await fetchIndexesAndSetState();
+      await fetchResultsAndSetState();
     } catch (error) {
       console.error(error);
     }
@@ -39,9 +48,23 @@ function App() {
     }
   }, []);
 
+  const fetchResultsAndSetState = useCallback(async () => {
+    try {
+      const res = await fetchResults();
+
+      setResults(res);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchIndexesAndSetState();
   }, [fetchIndexesAndSetState]);
+
+  useEffect(() => {
+    fetchResultsAndSetState();
+  }, [fetchResultsAndSetState]);
 
   return (
     <div className="App">
@@ -57,9 +80,17 @@ function App() {
       </form>
       <div>
         <h2>Indexes I have seen:</h2>
+        <ul className="indecies">
+          {
+            indexes.map(({ number }, i) => <li key={`${number}${i}`}>{number}</li>)
+          }
+        </ul>
+      </div>
+      <div>
+        <h2>Calculated Values:</h2>
         <ul>
           {
-            indexes.map(({ number }) => <li key={number}>{number}</li>)
+            Object.keys(results).map((key, i) => <li key={`${key}${i}`}>{results[key]}</li>)
           }
         </ul>
       </div>

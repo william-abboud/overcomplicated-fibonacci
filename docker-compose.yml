@@ -10,8 +10,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4000:80"
-  postgre:
+  postgres:
     image: postgres:latest
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_HOST_AUTH_METHOD=trust
   worker:
     build:
       context: ./worker
@@ -28,7 +31,7 @@ services:
      - DB_PASSWORD=postgres_password
      - DB_HOST=postgres
      - DB_PORT=5432
-     - DB_NAME=postgres
+     - DB_NAME=db
      - REDIS_HOST=redis
      - REDIS_PORT=6379
     ports:
@@ -43,5 +46,5 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./server:/app
+      - ./frontend:/app
       - /app/node_modules

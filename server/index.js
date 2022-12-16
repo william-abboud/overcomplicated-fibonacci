@@ -25,8 +25,6 @@ const pool = new Pool({
     database: dbName,
 });
 
-pool.connect();
-
 pool.on('error', () => {
     console.log('Lost PG connection');
 });
@@ -47,10 +45,10 @@ app.get('/values', async (req, res) => {
     res.send(rows);
 }); 
 
-app.get('/values/current', (req, res) => {
-    redisClient.hgetall('values', (err, values) => {
-        res.send(values);
-    });
+app.get('/values/current', async (req, res) => {
+    const values = await redisClient.hGetAll('values');
+
+    res.send(values);
 });
 
 app.post('/calculate-fibonacci', async (req, res) => {
@@ -64,15 +62,19 @@ app.post('/calculate-fibonacci', async (req, res) => {
         return res.status(400).send('Number too high');
     }
     
-    redisClient.hset('values', num, 'Calculating...');
+    await redisClient.hSet('values', num, 'Calculating...');
     
-    await redisPublisher.publish('insert', num);
+    await redisPublisher.publish('insert', num.toString());
     
-    pool.query("INSERT INTO values VALUES ($1)", [num]);
+    await pool.query("INSERT INTO values VALUES ($1)", [num]);
 
     res.send({ working: true });
 });
 
-app.listen(5000, () => {
+app.listen(5000, async () => {
     console.log('Listening on port 5000');
+
+    await pool.connect();
+    await redisClient.connect()
+    await redisPublisher.connect();
 });

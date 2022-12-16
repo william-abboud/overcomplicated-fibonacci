@@ -14,12 +14,13 @@ subscriber.on('error', (error) => {
 
 (async () => {
     try {
+        await redisClient.connect();
         await subscriber.connect();
 
-        await subscriber.subscribe('insert', (message) => {
+        await subscriber.subscribe('insert', async (message) => {
            const result = fibonacciSequence(parseInt(message));
 
-           redisClient.hSet('values', message, result);
+           await redisClient.hSet('values', message, `${result}`);
         });
     } catch (error) {
         console.error(error);

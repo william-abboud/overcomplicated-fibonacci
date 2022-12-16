@@ -1,3 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.indecies {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 5px;
+  justify-content: center;
+  list-style: none;
+}
+
+.indecies li {
+  border: 1px solid #ccc;
+  display: inline-flex;
+  padding: 5px;
+}
+
 .App {
   text-align: center;
 }
